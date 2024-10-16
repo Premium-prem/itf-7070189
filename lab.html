@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="web.css">
+</head>
+<body>
+    <h1 id="username">Username</h1>
+    <div id="Profile">
+        <div class="notification">1</div>
+    </div>
+    
+    <div class="input-section">
+        <label for="input">Set username: </label>
+        <input type="text" placeholder="Enter" id="input">
+        <button onclick="setusername()">Set</button>
+    </div>
+    
+    <div class="input-section">
+        <label for="inputimage">Set Profile URL: </label>
+        <input type="text" placeholder="Enter URL" id="inputimage">
+        <button onclick="setimage()">Set</button>
+    </div>
+    
+    <div class="input-section">
+        <label>Member Name and Phone</label><br>
+        <input type="text" placeholder="Name" id="NameMem">
+        <input type="text" placeholder="Tel" id="Tel">
+        <button onclick="addMember()">Add Member</button>
+        <button onclick="saveCSV()">Export CSV</button>
+    </div>
+    
+    <table id="phone-list">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Name</th>
+                <th>Phone Number</th>
+            </tr>
+        </thead>
+        <tbody id="parent">
+        </tbody>
+    </table>
+
+    <script>
+        const username = document.getElementById("username");
+        const input = document.getElementById("input");
+        const profile = document.getElementById("Profile");
+
+        function setusername(){
+            username.textContent = input.value || "Username";
+            input.value = "";
+        }
+
+        function setimage(){
+            const imageUrl = document.getElementById("inputimage").value;
+            if (imageUrl) {
+                profile.style.backgroundImage = "url(" + imageUrl + ")";
+                document.getElementById("inputimage").value = "";
+            }
+        }
+
+        let memberList = [];
+
+        function addMember() {
+            const name = document.getElementById("NameMem").value;
+            const phone = document.getElementById("Tel").value;
+
+            if (name && phone) {
+                memberList.push([name, phone]);
+                updateTable();
+                document.getElementById("NameMem").value = "";
+                document.getElementById("Tel").value = "";
+            } else {
+                alert("Please fill in both fields.");
+            }
+        }
+
+        function updateTable() {
+            const tableBody = document.getElementById("parent");
+            tableBody.innerHTML = "";
+            memberList.forEach((member, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${member[0]}</td>
+                    <td>${member[1]}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function saveCSV() {
+            let csvContent = "No.,Name,Phone Number\n";
+            memberList.forEach((member, index) => {
+                csvContent += `${index + 1},${member[0]},${member[1]}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "phone_list.csv");
+            link.style.visibility = "hidden";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
